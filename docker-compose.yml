@@ -1,0 +1,45 @@
+version: '3.2'
+services:
+  jenkins:
+    image: jenkinsci/blueocean:latest
+    ports:
+      - "50000:50000"
+      - "8080:8080"
+    volumes:
+      - type: volume
+        source: jenkins_home
+        target: /var/jenkins_home 
+  nginx:
+    build:
+      context: nginx
+      args:
+        PUBLIC_HOSTNAME: $PUBLIC_HOSTNAME
+    ports:
+     - "80:80"
+     - "443:443"
+    volumes:
+      - type: volume
+        source: certs
+        target: /etc/letsencrypt
+      - type: volume
+        source: webroot 
+        target: /usr/share/nginx/html
+  certbot:
+    build:
+      context: certbot
+      args:
+        PUBLIC_HOSTNAME: $PUBLIC_HOSTNAME
+        EMAIL_ADDRESS: $EMAIL_ADDRESS
+    depends_on:
+      - nginx
+    volumes:
+      - type: volume
+        source: certs
+        target: /etc/letsencrypt
+      - type: volume
+        source: webroot
+        target: /usr/share/nginx/html
+volumes:
+  jenkins_home:
+  certs:
+  webroot:
