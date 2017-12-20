@@ -1,6 +1,7 @@
 version: '3.2'
 services:
   jenkins:
+    user: root
     image: jenkinsci/blueocean:latest
     ports:
       - "50000:50000"
@@ -9,6 +10,9 @@ services:
       - type: volume
         source: jenkins_home
         target: /var/jenkins_home 
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
   nginx:
     build:
       context: nginx
